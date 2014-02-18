@@ -19,7 +19,7 @@ func NewProp() Properties {
 }
 
 // get value as string.
-// different to prop[key],the return string value is Unquoted.
+// the same to prop[key].
 func (this *Properties) Get(key string) (string, error) {
 	v, ok := (*this)[key]
 
