@@ -43,3 +43,10 @@ func main() {
 }
 
 ```
+
+**install**
+
+```
+go get -u github.com/aotian16/goprop
+go install github.com/aotian16/goprop
+```
