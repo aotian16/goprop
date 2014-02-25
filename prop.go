@@ -106,7 +106,14 @@ func Load(reader io.Reader) (Properties, error) {
 	scanner := bufio.NewScanner(reader)
 
 	for scanner.Scan() {
-		kv := strings.SplitN(scanner.Text(), "=", 2)
+		line := strings.TrimSpace(scanner.Text())
+
+		// skip comment(start with #)
+		if strings.HasPrefix(line, "#") {
+			continue
+		}
+
+		kv := strings.SplitN(line, "=", 2)
 
 		if len(kv) == 2 {
 			k := strings.TrimSpace(kv[0])
