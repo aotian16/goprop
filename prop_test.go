@@ -2,156 +2,289 @@
 package goprop
 
 import (
-	"bufio"
-	"errors"
-	"io"
-	"os"
-	"strconv"
-	"strings"
+	"testing"
 )
 
-type Properties map[string]string
+func TestNewProp(t *testing.T) {
+	prop := NewProp()
 
-var NotExistKeyError error = errors.New("NotExistKeyError")
-
-func NewProp() Properties {
-	return make(Properties)
+	if prop == nil {
+		t.Errorf("NewProp() return nil")
+	}
 }
 
-// get value as string.
-// different to prop[key],the return string value is Unquoted.
-func (this *Properties) Get(key string) (string, error) {
-	v, ok := (*this)[key]
+func TestGet(t *testing.T) {
+	prop := NewProp()
 
-	if !ok {
-		return "", NotExistKeyError
+	prop["key"] = "value"
+
+	_, e := prop.Get("errorkey")
+
+	if e == nil {
+		t.Errorf("Get() should return error when key not exists")
 	}
 
-	return v, nil
+	v1, e1 := prop.Get("key")
+
+	if e1 != nil {
+		t.Errorf("Get() return nil when key exists")
+	}
+
+	if v1 != "value" {
+		t.Errorf("Get() return error value")
+	}
 }
 
-// get value as int
-func (this *Properties) Atoi(key string) (int, error) {
-	v, ok := (*this)[key]
+func TestAtoi(t *testing.T) {
+	prop := NewProp()
 
-	if !ok {
-		return 0, NotExistKeyError
+	prop["key"] = "123"
+
+	_, e := prop.Atoi("errorkey")
+
+	if e == nil {
+		t.Errorf("Atoi() should return error when key not exists")
 	}
 
-	return strconv.Atoi(v)
+	v1, e1 := prop.Atoi("key")
+
+	if e1 != nil {
+		t.Errorf("Atoi() return nil when key exists")
+	}
+
+	if v1 != 123 {
+		t.Errorf("Atoi() return error value")
+	}
+
+	prop["key"] = "-123"
+
+	v2, e2 := prop.Atoi("key")
+
+	if e2 != nil {
+		t.Errorf("Atoi() return nil when key exists")
+	}
+
+	if v2 != -123 {
+		t.Errorf("Atoi() return error value")
+	}
+
+	prop["key"] = "0"
+
+	v3, e3 := prop.Atoi("key")
+
+	if e3 != nil {
+		t.Errorf("Atoi() return nil when key exists")
+	}
+
+	if v3 != 0 {
+		t.Errorf("Atoi() return error value")
+	}
+
+	prop["key"] = "xxx"
+
+	_, e4 := prop.Atoi("key")
+
+	if e4 == nil {
+		t.Errorf("Atoi() should return error when Atoi error")
+	}
 }
 
-// get value as bool
-func (this *Properties) ParseBool(key string) (bool, error) {
-	v, ok := (*this)[key]
+func TestParseBool(t *testing.T) {
+	prop := NewProp()
 
-	if !ok {
-		return false, NotExistKeyError
+	prop["key"] = "True"
+
+	_, e := prop.ParseBool("errorkey")
+
+	if e == nil {
+		t.Errorf("ParseBool() should return error when key not exists")
 	}
 
-	return strconv.ParseBool(v)
+	v1, e1 := prop.ParseBool("key")
+
+	if e1 != nil {
+		t.Errorf("ParseBool() return nil when key exists")
+	}
+
+	if v1 != true {
+		t.Errorf("ParseBool() return error value")
+	}
+
+	prop["key"] = "False"
+
+	v2, e2 := prop.ParseBool("key")
+
+	if e2 != nil {
+		t.Errorf("ParseBool() return nil when key exists")
+	}
+
+	if v2 != false {
+		t.Errorf("ParseBool() return error value")
+	}
+
+	prop["key"] = "xxx"
+
+	_, e3 := prop.ParseBool("key")
+
+	if e3 == nil {
+		t.Errorf("ParseBool() should return error when ParseBool error")
+	}
 }
 
-// get value as float
-func (this *Properties) ParseFloat(key string) (float64, error) {
-	v, ok := (*this)[key]
+func TestParseFloat(t *testing.T) {
+	prop := NewProp()
 
-	if !ok {
-		return 0, NotExistKeyError
+	prop["key"] = "123.456"
+
+	_, e := prop.ParseFloat("errorkey")
+
+	if e == nil {
+		t.Errorf("ParseFloat() should return error when key not exists")
 	}
 
-	return strconv.ParseFloat(v, 64)
+	v1, e1 := prop.ParseFloat("key")
+
+	if e1 != nil {
+		t.Errorf("ParseFloat() return nil when key exists")
+	}
+
+	if v1 != 123.456 {
+		t.Errorf("ParseFloat() return error value")
+	}
+
+	prop["key"] = "-123.456"
+
+	v2, e2 := prop.ParseFloat("key")
+
+	if e2 != nil {
+		t.Errorf("ParseFloat() return nil when key exists")
+	}
+
+	if v2 != -123.456 {
+		t.Errorf("ParseFloat() return error value")
+	}
+
+	prop["key"] = "0.0"
+
+	v3, e3 := prop.ParseFloat("key")
+
+	if e3 != nil {
+		t.Errorf("ParseFloat() return nil when key exists")
+	}
+
+	if v3 != 0.0 {
+		t.Errorf("ParseFloat() return error value")
+	}
+
+	prop["key"] = "xxx"
+
+	_, e4 := prop.ParseFloat("key")
+
+	if e4 == nil {
+		t.Errorf("ParseFloat() should return error when ParseFloat error")
+	}
 }
 
-// get value as int
-func (this *Properties) ParseInt(key string) (int64, error) {
-	v, ok := (*this)[key]
+func TestParseInt(t *testing.T) {
+	prop := NewProp()
 
-	if !ok {
-		return 0, NotExistKeyError
+	prop["key"] = "123"
+
+	_, e := prop.ParseInt("errorkey")
+
+	if e == nil {
+		t.Errorf("ParseInt() should return error when key not exists")
 	}
 
-	return strconv.ParseInt(v, 10, 64)
+	v1, e1 := prop.ParseInt("key")
+
+	if e1 != nil {
+		t.Errorf("ParseInt() return nil when key exists")
+	}
+
+	if v1 != 123 {
+		t.Errorf("ParseInt() return error value")
+	}
+
+	prop["key"] = "-123"
+
+	v2, e2 := prop.ParseInt("key")
+
+	if e2 != nil {
+		t.Errorf("ParseInt() return nil when key exists")
+	}
+
+	if v2 != -123 {
+		t.Errorf("ParseInt() return error value")
+	}
+
+	prop["key"] = "0"
+
+	v3, e3 := prop.ParseInt("key")
+
+	if e3 != nil {
+		t.Errorf("ParseInt() return nil when key exists")
+	}
+
+	if v3 != 0 {
+		t.Errorf("ParseInt() return error value")
+	}
+
+	prop["key"] = "xxx"
+
+	_, e4 := prop.ParseInt("key")
+
+	if e4 == nil {
+		t.Errorf("ParseInt() should return error when ParseInt error")
+	}
 }
 
-// get value as uint
-func (this *Properties) ParseUint(key string) (uint64, error) {
-	v, ok := (*this)[key]
+func TestParseUint(t *testing.T) {
+	prop := NewProp()
 
-	if !ok {
-		return 0, NotExistKeyError
+	prop["key"] = "123"
+
+	_, e := prop.ParseUint("errorkey")
+
+	if e == nil {
+		t.Errorf("ParseUint() should return error when key not exists")
 	}
 
-	return strconv.ParseUint(v, 10, 64)
-}
+	v1, e1 := prop.ParseUint("key")
 
-// load properties from file
-func LoadFile(fileName string) (Properties, error) {
-	p := make(Properties)
-	file, err := os.Open(fileName)
-
-	if err != nil {
-		return p, err
+	if e1 != nil {
+		t.Errorf("ParseUint() return nil when key exists")
 	}
 
-	defer file.Close()
-
-	return Load(file)
-}
-
-// load properties from reader
-func Load(reader io.Reader) (Properties, error) {
-	p := make(Properties)
-
-	scanner := bufio.NewScanner(reader)
-
-	for scanner.Scan() {
-		kv := strings.SplitN(scanner.Text(), "=", 2)
-
-		if len(kv) == 2 {
-			k := strings.TrimSpace(kv[0])
-			v := strings.TrimSpace(kv[1])
-			p[k] = v
-		}
+	if v1 != 123 {
+		t.Errorf("ParseUint() return error value")
 	}
 
-	if scanner.Err() != nil {
-		return p, scanner.Err()
+	prop["key"] = "-123"
+
+	_, e2 := prop.ParseUint("key")
+
+	if e2 == nil {
+		t.Errorf("ParseUint() should return error when ParseUint error")
 	}
 
-	return p, nil
-}
+	prop["key"] = "0"
 
-// save properties to file
-// * file must not exist, because it's dangerous to overwrite
-func SaveFile(prop Properties, fileName string) error {
-	file, errOpen := os.OpenFile(fileName, os.O_CREATE|os.O_EXCL, os.ModePerm)
+	v3, e3 := prop.ParseUint("key")
 
-	if errOpen != nil {
-		return errOpen
+	if e3 != nil {
+		t.Errorf("ParseUint() return nil when key exists")
 	}
 
-	defer file.Close()
-
-	return Save(prop, file)
-}
-
-// save properties to writer
-func Save(prop Properties, writer io.Writer) error {
-	bufWriter := bufio.NewWriter(writer)
-
-	for k, v := range prop {
-		_, err := bufWriter.WriteString(k + "=" + v + "\n")
-
-		if err != nil {
-			return err
-		}
+	if v3 != 0 {
+		t.Errorf("ParseUint() return error value")
 	}
 
-	errFlush := bufWriter.Flush()
-	if errFlush != nil {
-		return errFlush
-	}
+	prop["key"] = "xxx"
 
-	return nil
+	_, e4 := prop.ParseUint("key")
+
+	if e4 == nil {
+		t.Errorf("ParseUint() should return error when ParseUint error")
+	}
 }
