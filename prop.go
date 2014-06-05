@@ -143,7 +143,7 @@ func SaveFile(prop Properties, fileName string) error {
 	return Save(prop, file)
 }
 func SaveFileForce(prop Properties, fileName string) error {
-	file, errOpen := os.OpenFile(fileName, os.O_CREATE|os.O_RDWR, os.ModePerm)
+	file, errOpen := os.OpenFile(fileName, os.O_CREATE|os.O_TRUNC|os.O_RDWR, os.ModePerm)
 
 	if errOpen != nil {
 		return errOpen
